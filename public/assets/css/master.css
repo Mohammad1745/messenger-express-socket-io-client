@@ -1,0 +1,73 @@
+:root {
+    --primary: #aaa;
+    --secondary: #777;
+    --initiate-activation: #ddf;
+    --animate-activation: #5566ff;
+    --active: #0053ACFF;
+    --initate-path: #f77;
+    --animate-path: #ca4;
+    --path: #4a4;
+    --initiate-wall: #555;
+    --animate-wall: #ddd;
+    --wall: #000;
+    --weight: #d94;
+}
+/*body {*/
+/*    background-color: var(--primary);*/
+/*}*/
+.cursor-pointer {
+    cursor: pointer;
+}
+.fa-spinner {
+    -webkit-animation:spin 3s linear infinite;
+    -moz-animation:spin 3s linear infinite;
+    animation:spin 3s linear infinite;
+}
+@keyframes spin {
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform:rotate(360deg);
+    }
+}
+/*
+App
+*/
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 50px;
+    width: 150px;
+    background-color: var(--secondary);
+    animation: loading 2s linear infinite;
+}
+
+@keyframes loading {
+    0%{
+        transform: translate(-50%, -50%);
+    }
+    25%{
+        transform: translate(-100%, -50%);
+    }
+    75%{
+        transform: translate(0%, -50%);
+    }
+    100%{
+        transform: translate(-50%, -50%);
+    }
+}
+
+.navbar-brand{
+    font-weight: bold;
+    font-family: sans-serif;
+}
+.navbar-nav{
+    font-size: 15px;
+}
+.navbar-nav button{
+    font-size: 15px;
+}
+.navbar-nav .nav-item .nav-link{
+    color: rgba(255,255,255,.9);
+}
