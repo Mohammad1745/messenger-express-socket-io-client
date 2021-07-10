@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let loginSubmitButton = document.querySelector('#register_form_submit_btn')
-    loginSubmitButton.addEventListener('click', () => {
+    let registerSubmitButton = document.querySelector('#register_form_submit_btn')
+    registerSubmitButton.addEventListener('click', () => {
         let firstName = document.querySelector("#first_name_input").value
         let lastName = document.querySelector("#last_name_input").value
         let phoneCode = document.querySelector("#phone_code_input").value
@@ -20,7 +20,7 @@ function submitLoginForm ({ firstName, lastName, phoneCode, phone, email, passwo
         data: { firstName, lastName, phoneCode, phone, email, password, confirmPassword},
     }).done(response => {
         if (response.success) {
-            console.log(response.message)
+            window.location.replace("./phone_verification.html")
         } else {
             if (typeof response.message === "string") helper.alertMessage(response.message, "error")
             else handleRequestError(response.message)
