@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let loginSubmitButton = document.querySelector('#login_submit_btn')
+    let loginSubmitButton = document.querySelector('#login_form_submit_btn')
     loginSubmitButton.addEventListener('click', () => {
         let email = document.querySelector("#email_input").value
         let password = document.querySelector("#password_input").value
