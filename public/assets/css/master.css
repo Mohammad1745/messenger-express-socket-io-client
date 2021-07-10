@@ -32,6 +32,9 @@
 /*
 App
 */
+body {
+    margin-bottom: 50px;
+}
 .loading {
     position: absolute;
     top: 50%;
