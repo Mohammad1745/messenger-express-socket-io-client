@@ -26,20 +26,20 @@
 
         function checkAuthorization(dashboard, login) {
             $.ajax({
-                    url: "http://127.0.0.1:8000/api/auth/login",
-                    type: "GET",
-                    data: { },
-            })
-                .done(response => {
-                    if (response.success) dashboard()
-                    else login()
-                })
-                .fail(login)
+                url: "http://127.0.0.1:8000/api/user/dashboard",
+                type: "GET",
+                headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
+            }).done(response => {
+                // console.log(response)
+                if (response.success) dashboard()
+                else login()
+            }).fail(login)
         }
         function dashboard() {
             window.location.replace("./user/dashboard.html")
         }
-        function login() {
+        function login(err) {
+            // console.log(err)
             window.location.replace("./authentication/login.html")
         }
     })

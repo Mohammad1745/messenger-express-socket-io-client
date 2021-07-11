@@ -48,7 +48,7 @@ function handleRequestSuccess (response) {
 
     if (response.data.isPhoneVerified) {
         localStorage.setItem('success', response.message)
-        console.log('redirect to dashboard')
+        window.location.replace("../user/dashboard.html")
     }
     else {
         localStorage.setItem('success', 'Account not verified.')
