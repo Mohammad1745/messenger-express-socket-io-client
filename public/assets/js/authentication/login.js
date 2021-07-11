@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    helper.checkAlert()
     handleLoginForm()
 })
 
@@ -9,28 +10,6 @@ function handleLoginForm() {
         let password = document.querySelector("#password_input").value
         let validated = validateForm({email, password})
         if (validated) submitLoginForm({email, password})
-    })
-}
-
-function submitLoginForm ({email, password}) {
-    $.ajax({
-        url: "http://127.0.0.1:8000/api/auth/login",
-        method: "POST",
-        data: {
-            email, password
-        },
-    }).done(response => {
-        if (response.success) {
-            localStorage.setItem('tokenType', response.data.authorization.tokenType)
-            localStorage.setItem('token', response.data.authorization.token)
-            if (response.data.isPhoneVerified) console.log('redirect to dashboard')
-            else window.location.replace("./phone_verification.html")
-        } else {
-            if (typeof response.message === "string") helper.alertMessage(response.message, "error")
-            else handleRequestError(response.message)
-        }
-    }).fail(err => {
-        console.log(err)
     })
 }
 
@@ -47,9 +26,44 @@ function validateForm ({ email, password}) {
     return validated
 }
 
-function handleRequestError(message) {
-    Object.keys(message).map(key => {
-        if (key === "email") document.getElementById('email_error_message').innerHTML = message[key].msg
-        else if (key === "password") document.getElementById('password_error_message').innerHTML = message[key].msg
+function submitLoginForm ({email, password}) {
+    $.ajax({
+        url: "http://127.0.0.1:8000/api/auth/login",
+        method: "POST",
+        data: {
+            email, password
+        },
+    }).done(response => {
+        response.success ?
+            handleRequestSuccess(response)
+            : handleRequestError(response)
+    }).fail(err => {
+        console.log(err)
     })
+}
+
+function handleRequestSuccess (response) {
+    localStorage.setItem('tokenType', response.data.authorization.tokenType)
+    localStorage.setItem('token', response.data.authorization.token)
+
+    if (response.data.isPhoneVerified) {
+        localStorage.setItem('success', response.message)
+        console.log('redirect to dashboard')
+    }
+    else {
+        localStorage.setItem('success', 'Account not verified.')
+        window.location.replace("./phone_verification.html")
+    }
+}
+
+function handleRequestError(response) {
+    if (typeof response.message === "string") {
+        helper.alertMessage(response.message, "error")
+    }
+    else {
+        Object.keys(response.message).map(key => {
+            if (key === "email") document.getElementById('email_error_message').innerHTML = response.message[key].msg
+            else if (key === "password") document.getElementById('password_error_message').innerHTML = response.message[key].msg
+        })
+    }
 }

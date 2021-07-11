@@ -20,5 +20,18 @@ let helper = {
         setTimeout(() => {
             document.querySelector('.close').click()
         }, 2000)
+    },
+
+    checkAlert: () => {
+        let success = localStorage.getItem('success')
+        let error = localStorage.getItem('error')
+        if (success) {
+            localStorage.removeItem("success")
+            helper.alertMessage(success, "success")
+        }
+        else if (error) {
+            localStorage.removeItem("error")
+            helper.alertMessage(error, "error")
+        }
     }
 }

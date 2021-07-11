@@ -1,4 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+    helper.checkAlert()
+    handleSignupForm()
+})
+
+function handleSignupForm() {
     let registerSubmitButton = document.querySelector('#register_form_submit_btn')
     registerSubmitButton.addEventListener('click', () => {
         let firstName = document.querySelector("#first_name_input").value
@@ -9,24 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let password = document.querySelector("#password_input").value
         let confirmPassword = document.querySelector("#confirm_password_input").value
         let validated = validateForm({ firstName, lastName, phoneCode, phone, email, password, confirmPassword})
-        if (validated) submitLoginForm({ firstName, lastName, phoneCode, phone, email, password, confirmPassword})
-    })
-})
-
-function submitLoginForm ({ firstName, lastName, phoneCode, phone, email, password, confirmPassword}) {
-    $.ajax({
-        url: "http://127.0.0.1:8000/api/auth/register",
-        method: "POST",
-        data: { firstName, lastName, phoneCode, phone, email, password, confirmPassword},
-    }).done(response => {
-        if (response.success) {
-            window.location.replace("./phone_verification.html")
-        } else {
-            if (typeof response.message === "string") helper.alertMessage(response.message, "error")
-            else handleRequestError(response.message)
-        }
-    }).fail(err => {
-        console.log(err)
+        if (validated) submitSignupForm({ firstName, lastName, phoneCode, phone, email, password, confirmPassword})
     })
 }
 
@@ -63,14 +51,39 @@ function validateForm ({ firstName, lastName, phoneCode, phone, email, password,
     return validated
 }
 
-function handleRequestError(message) {
-    Object.keys(message).map(key => {
-        if (key === "firstName") document.getElementById('first_name_error_message').innerHTML = message[key].msg
-        else if (key === "lastName") document.getElementById('last_name_error_message').innerHTML = message[key].msg
-        else if (key === "phoneCode") document.getElementById('phone_code_error_message').innerHTML = message[key].msg
-        else if (key === "phone") document.getElementById('phone_error_message').innerHTML = message[key].msg
-        else if (key === "email") document.getElementById('email_error_message').innerHTML = message[key].msg
-        else if (key === "password") document.getElementById('password_error_message').innerHTML = message[key].msg
-        else if (key === "confirmPassword") document.getElementById('confirm_password_error_message').innerHTML = message[key].msg
+
+function submitSignupForm ({ firstName, lastName, phoneCode, phone, email, password, confirmPassword}) {
+    $.ajax({
+        url: "http://127.0.0.1:8000/api/auth/register",
+        method: "POST",
+        data: { firstName, lastName, phoneCode, phone, email, password, confirmPassword},
+    }).done(response => {
+        response.success ?
+            handleRequestSuccess(response)
+            : handleRequestError(response)
+    }).fail(err => {
+        console.log(err)
+    })
+}
+
+function handleRequestSuccess (response) {
+    localStorage.setItem('tokenType', response.data.authorization.tokenType)
+    localStorage.setItem('token', response.data.authorization.token)
+    localStorage.setItem('success', response.message)
+
+    window.location.replace("./phone_verification.html")
+}
+
+function handleRequestError(response) {
+    if (typeof response.message === "string") helper.alertMessage(response.message, "error")
+    else
+        Object.keys(response.message).map(key => {
+        if (key === "firstName") document.getElementById('first_name_error_message').innerHTML = response.message[key].msg
+        else if (key === "lastName") document.getElementById('last_name_error_message').innerHTML = response.message[key].msg
+        else if (key === "phoneCode") document.getElementById('phone_code_error_message').innerHTML = response.message[key].msg
+        else if (key === "phone") document.getElementById('phone_error_message').innerHTML = response.message[key].msg
+        else if (key === "email") document.getElementById('email_error_message').innerHTML = response.message[key].msg
+        else if (key === "password") document.getElementById('password_error_message').innerHTML = response.message[key].msg
+        else if (key === "confirmPassword") document.getElementById('confirm_password_error_message').innerHTML = response.message[key].msg
     })
 }
