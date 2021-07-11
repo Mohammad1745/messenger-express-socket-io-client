@@ -2,7 +2,7 @@ let helper = {
     DOMAIN: "http://127.0.0.1:8000",
 
     alertMessage : (message, type="success") => {
-        let content = `<div style="position: absolute; left: 0; top: 0; width: 100%; z-index: 100">`
+        let content = `<div style="position: fixed; left: 0; top: 0; width: 100%; z-index: 100">`
         if(type==="success") {
             content += `
                 <div class="alert-float alert alert-success alert-dismissable">

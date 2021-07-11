@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     addProfileInfo()
     handleUpdateImageForm()
+    handleUpdateInfoForm()
 })
 
 function addProfileInfo() {
@@ -92,4 +93,61 @@ function handleAvatarFormRequestError(response) {
         window.location.replace('../authentication/login.html')
     }
     else helper.alertMessage(response.message, "error")
+}
+
+//update profile info form
+function handleUpdateInfoForm() {
+    let profileInfoSubmitButton = document.querySelector('#profile_info_form_submit_btn')
+    profileInfoSubmitButton.addEventListener('click', () => {
+        let firstName = document.querySelector("#first_name_input").value
+        let lastName = document.querySelector("#last_name_input").value
+        let validated = validateInfoForm({ firstName, lastName})
+        if (validated) submitInfoForm({ firstName, lastName})
+    })
+}
+
+function validateInfoForm ({ firstName, lastName}) {
+    let validated = true
+    if (!firstName) {
+        validated = false
+        document.getElementById('first_name_error_message').innerHTML = "First Name Empty"
+    }
+    if (!lastName) {
+        validated = false
+        document.getElementById('last_name_error_message').innerHTML = "Last Name Empty"
+    }
+    return validated
+}
+
+
+function submitInfoForm ({ firstName, lastName}) {
+    $.ajax({
+        url: helper.DOMAIN+"/api/user/profile/update-info",
+        method: "POST",
+        headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
+        data: { firstName, lastName},
+    }).done(response => {
+        response.success ?
+            handleUpdateInfoRequestSuccess(response)
+            : handleUpdateInfoRequestError(response)
+    }).fail(err => {
+        console.log(err)
+    })
+}
+
+function handleUpdateInfoRequestSuccess (response) {
+    helper.alertMessage(response.message, "success")
+}
+
+function handleUpdateInfoRequestError(response) {
+    if (response.message === "Unauthenticated") {
+        window.location.replace('../authentication/login.html')
+    }
+    else if (typeof response.message === "string") helper.alertMessage(response.message, "error")
+    else {
+        Object.keys(response.message).map(key => {
+            if (key === "firstName") document.getElementById('first_name_error_message').innerHTML = response.message[key].msg
+            else if (key === "lastName") document.getElementById('last_name_error_message').innerHTML = response.message[key].msg
+        })
+    }
 }
