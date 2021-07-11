@@ -33,5 +33,15 @@ let helper = {
             localStorage.removeItem("error")
             helper.alertMessage(error, "error")
         }
+    },
+
+    handleLogoutButton:() => {
+        let logoutButton = document.querySelector('#logout_btn')
+        logoutButton.addEventListener('click', () => {
+            localStorage.removeItem("tokenType")
+            localStorage.removeItem("token")
+            localStorage.setItem('success', "Logged Out Successfully.")
+            window.location.replace('../authentication/login.html')
+        })
     }
 }
