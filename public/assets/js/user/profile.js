@@ -22,12 +22,13 @@ function addProfileInfo() {
 
 function handleProfileInfoRequestSuccess (response) {
     let user = response.data
+    let image = helper.DOMAIN+"/uploads/avatar/"+user.image
     document.getElementById("first_name_input").value = user.firstName
     document.getElementById("last_name_input").value = user.lastName
     document.getElementById("email_input").value = user.email
     document.getElementById("phone_code_input").value = user.phoneCode
     document.getElementById("phone_input").value = user.phone
-    document.getElementById("user_avatar").innerHTML = `<img src="${user.image}" height="200">`
+    document.getElementById("user_avatar").innerHTML = `<img src="${image}" height="200">`
 }
 
 function handleProfileInfoRequestError(response) {
@@ -45,22 +46,19 @@ function handleProfileInfoRequestError(response) {
 function handleUpdateImageForm() {
     let updateImageFormSubmitButton = document.querySelector('#upload_image_form_submit_btn')
     updateImageFormSubmitButton.addEventListener('click', () => {
-        // let image = document.querySelector("#image_input").value
-        // if (image) submitLoginForm(image)
-
         let formData = new FormData();
         let files = $('#image_input')[0].files
-        // Check file selected or not
+
         if(files.length > 0 ){
             formData.append('image',files[0]);
-            submitLoginForm(formData)
+            submitUserAvatarForm(formData)
         }else{
-            alert("Please select a file.");
+            helper.alertMessage("Please select a file.", "error");
         }
     })
 }
 
-function submitLoginForm (formData) {
+function submitUserAvatarForm (formData) {
         $.ajax({
             url: "http://127.0.0.1:8000/api/user/profile/upload-image",
             method: "POST",
@@ -70,25 +68,19 @@ function submitLoginForm (formData) {
             processData: false,
         }).done(response => {
             response.success ?
-                handleRequestSuccess(response)
-                : handleRequestError(response)
+                handleAvatarFormRequestSuccess(response)
+                : handleAvatarFormRequestError(response)
         }).fail(err => {
             console.log(err)
         })
 }
 
-function handleRequestSuccess (response) {
-    location.reload()
+function handleAvatarFormRequestSuccess (response) {
+    let image = helper.DOMAIN+"/uploads/avatar/"+response.data.image
+    document.getElementById("user_avatar").innerHTML = `<img src="${image}" height="200">`
+    helper.alertMessage(response.message, "success");
 }
 
-function handleRequestError(response) {
-    if (typeof response.message === "string") {
-        helper.alertMessage(response.message, "error")
-    }
-    else {
-        Object.keys(response.message).map(key => {
-            if (key === "email") document.getElementById('email_error_message').innerHTML = response.message[key].msg
-            else if (key === "password") document.getElementById('password_error_message').innerHTML = response.message[key].msg
-        })
-    }
+function handleAvatarFormRequestError(response) {
+    helper.alertMessage(response.message, "error")
 }
