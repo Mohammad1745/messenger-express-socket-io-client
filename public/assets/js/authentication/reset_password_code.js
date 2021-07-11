@@ -44,7 +44,7 @@ function validateForm ({ phoneCode, phone, code, password, confirmPassword}) {
 
 function submitLoginForm ({ phoneCode, phone, code, password, confirmPassword}) {
     $.ajax({
-        url: "http://127.0.0.1:8000/api/auth/reset-password-code",
+        url: helper.DOMAIN+"/api/auth/reset-password-code",
         method: "PUT",
         data: { phoneCode, phone, code, password, confirmPassword},
     }).done(response => {

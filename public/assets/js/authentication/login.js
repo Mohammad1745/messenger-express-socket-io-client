@@ -28,7 +28,7 @@ function validateForm ({ email, password}) {
 
 function submitLoginForm ({email, password}) {
     $.ajax({
-        url: "http://127.0.0.1:8000/api/auth/login",
+        url: helper.DOMAIN+"/api/auth/login",
         method: "POST",
         data: {
             email, password
@@ -57,7 +57,10 @@ function handleRequestSuccess (response) {
 }
 
 function handleRequestError(response) {
-    if (typeof response.message === "string") {
+    if (response.message === "Unauthenticated") {
+        window.location.replace('../authentication/login.html')
+    }
+    else if (typeof response.message === "string") {
         helper.alertMessage(response.message, "error")
     }
     else {

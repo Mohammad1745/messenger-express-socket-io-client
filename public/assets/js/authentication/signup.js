@@ -54,7 +54,7 @@ function validateForm ({ firstName, lastName, phoneCode, phone, email, password,
 
 function submitSignupForm ({ firstName, lastName, phoneCode, phone, email, password, confirmPassword}) {
     $.ajax({
-        url: "http://127.0.0.1:8000/api/auth/register",
+        url: helper.DOMAIN+"/api/auth/register",
         method: "POST",
         data: { firstName, lastName, phoneCode, phone, email, password, confirmPassword},
     }).done(response => {

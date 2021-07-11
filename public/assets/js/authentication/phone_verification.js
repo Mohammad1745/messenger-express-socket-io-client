@@ -34,7 +34,7 @@ function validateForm ({ phoneCode, phone, code}) {
 
 function submitLoginForm ({ phoneCode, phone, code}) {
     $.ajax({
-        url: "http://127.0.0.1:8000/api/auth/phone-verification",
+        url: helper.DOMAIN+"/api/auth/phone-verification",
         method: "PUT",
         headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
         data: { phoneCode, phone, code},
@@ -54,7 +54,10 @@ function handleRequestSuccess (response) {
 }
 
 function handleRequestError(response) {
-    if (typeof response.message === "string") {
+    if (response.message === "Unauthenticated") {
+        window.location.replace('../authentication/login.html')
+    }
+    else if (typeof response.message === "string") {
         helper.alertMessage(response.message, "error")
     }
     else {
@@ -87,7 +90,7 @@ function handleResendCodeButton() {
     let resendCodeButton = document.querySelector('#resend_phone_verification_code_btn')
     resendCodeButton.addEventListener('click', () => {
         $.ajax({
-            url: "http://127.0.0.1:8000/api/auth/resend-phone-verification-code",
+            url: helper.DOMAIN+"/api/auth/resend-phone-verification-code",
             method: "GET",
             headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
         }).done(response => {

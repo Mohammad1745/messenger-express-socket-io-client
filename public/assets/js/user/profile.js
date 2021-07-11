@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function addProfileInfo() {
     $.ajax({
-        url: "http://127.0.0.1:8000/api/user/profile",
+        url: helper.DOMAIN+"/api/user/profile",
         method: "GET",
         headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
     }).done(response => {
@@ -33,7 +33,10 @@ function handleProfileInfoRequestSuccess (response) {
 }
 
 function handleProfileInfoRequestError(response) {
-    if (typeof response.message === "string") {
+    if (response.message === "Unauthenticated") {
+        window.location.replace('../authentication/login.html')
+    }
+    else if (typeof response.message === "string") {
         helper.alertMessage(response.message, "error")
     }
     else {
@@ -61,7 +64,7 @@ function handleUpdateImageForm() {
 
 function submitUserAvatarForm (formData) {
         $.ajax({
-            url: "http://127.0.0.1:8000/api/user/profile/upload-image",
+            url: helper.DOMAIN+"/api/user/profile/upload-image",
             method: "POST",
             headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
             data: formData,
@@ -85,5 +88,8 @@ function handleAvatarFormRequestSuccess (response) {
 }
 
 function handleAvatarFormRequestError(response) {
-    helper.alertMessage(response.message, "error")
+    if (response.message === "Unauthenticated") {
+        window.location.replace('../authentication/login.html')
+    }
+    else helper.alertMessage(response.message, "error")
 }
