@@ -83,3 +83,18 @@ body {
     height: 200px;
     background-color: #777777;
 }
+
+.chat{
+    /*border: var(--secondary) 1px solid;*/
+}
+.chat-list {
+    border: var(--secondary) 1px solid;
+}
+.chat-details {
+    height: 70vh;
+    border: var(--secondary) 1px solid;
+}
+.chat-list-item {
+    list-style-type: none;
+    border-bottom: var(--secondary) 1px solid;
+}
