@@ -71,3 +71,11 @@ body {
 .navbar-nav button{
     font-size: 15px;
 }
+
+.user-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    background-color: #777777;
+}
