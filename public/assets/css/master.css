@@ -71,7 +71,11 @@ body {
 .navbar-nav button{
     font-size: 15px;
 }
-
+.avatar {
+    height: 35px;
+    width: 35px;
+    border-radius: 50%;
+}
 .user-avatar {
     display: flex;
     justify-content: center;

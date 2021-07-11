@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     helper.checkAlert()
+    helper.updateAvatar()
     helper.handleLogoutButton()
 
     addProfileInfo()
@@ -78,7 +79,9 @@ function submitUserAvatarForm (formData) {
 function handleAvatarFormRequestSuccess (response) {
     let image = helper.DOMAIN+"/uploads/avatar/"+response.data.image
     document.getElementById("user_avatar").innerHTML = `<img src="${image}" height="200">`
+    helper.updateAvatar()
     helper.alertMessage(response.message, "success");
+    document.getElementById("image_input").value = ''
 }
 
 function handleAvatarFormRequestError(response) {

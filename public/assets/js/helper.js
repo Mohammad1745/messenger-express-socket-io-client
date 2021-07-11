@@ -45,5 +45,21 @@ let helper = {
             localStorage.setItem('success', "Logged Out Successfully.")
             window.location.replace('../authentication/login.html')
         })
+    },
+    updateAvatar:() => {
+        $.ajax({
+            url: "http://127.0.0.1:8000/api/user/profile",
+            method: "GET",
+            headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
+        }).done(response => {
+            if (response.success) {
+                let image = helper.DOMAIN+"/uploads/avatar/"+response.data.image
+                $("#avatar").attr("src", image)
+            } else {
+                window.location.replace("../authentication/login.html")
+            }
+        }).fail(err => {
+            console.log(err)
+        })
     }
 }
