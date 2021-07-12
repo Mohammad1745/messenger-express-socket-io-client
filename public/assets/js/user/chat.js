@@ -35,8 +35,8 @@ function handleChatListRequestSuccess (response) {
         let avatar = helper.DOMAIN+"/uploads/avatar/"+item.image
         chatList.insertAdjacentHTML('beforeend', `
             <li class="chat-list-item p-2 cursor-pointer" id="chat_list_item" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}">
-                <div class="user-name" id="user_name" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}"><img src="${avatar}" height="25" class="chat-user-name-avatar"> ${item.firstName} ${item.lastName}</div>
-                <div class="last-message" id="last_message" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}">${chat}</div>
+                <div class="user-name" id="user_name" data-id="${item.userId}"><img src="${avatar}" height="25" class="chat-user-name-avatar"> ${item.firstName} ${item.lastName}</div>
+                <div class="last-message" id="last_message" data-id="${item.userId}">${chat}</div>
             </li>    
         `)
     })
@@ -56,11 +56,11 @@ function handleChatListRequestError(response) {
 function handleChatDetails() {
     let chatListItems = document.getElementById('chat_list').querySelectorAll('.chat-list-item')
     for (let item of chatListItems) {
-        item.addEventListener('click', event => {
+        item.addEventListener('click', () => {
             user = {
-                id: event.target.getAttribute('data-id'),
-                name: event.target.getAttribute('data-name'),
-                avatar: event.target.getAttribute('data-avatar')
+                id: item.getAttribute('data-id'),
+                name: item.getAttribute('data-name'),
+                avatar: item.getAttribute('data-avatar')
             }
             updateChatDetails()
         })
@@ -86,8 +86,10 @@ function updateChatDetails () {
 function handleChatDetailsRequestSuccess (response) {
     let chatUserName = document.getElementById('chat_user_name')
     let chatDetails = document.getElementById('chat_details')
+    let sendMessageForm = document.getElementById('send_message_form')
+    sendMessageForm.style.display = "block"
     chatUserName.style.borderBottom = "#333 2px solid"
-    chatUserName.innerHTML = `<img src="${user.avatar}" height="25" class="chat-user-name-avatar"> ${user.name}`
+    chatUserName.innerHTML = `<img src="${user.avatar}" height="35" class="chat-user-name-avatar"> ${user.name}`
     chatDetails.innerHTML = ''
     if (response.data.length===0) chatDetails.innerHTML = 'No message yet'
 
