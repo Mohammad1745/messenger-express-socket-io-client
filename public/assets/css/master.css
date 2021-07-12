@@ -91,10 +91,15 @@ body {
     border-top: var(--secondary) 1px solid;
     border-right: var(--secondary) 10px solid;
 }
+
 .chat-details {
-    height: 75vh;
     border: var(--secondary) 1px solid;
 }
+.chat-details-body {
+    height: 70vh;
+    overflow-y: scroll;
+}
+
 .card-header,
 .card-footer{
     background-color: transparent;

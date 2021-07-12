@@ -27,7 +27,11 @@ function handleChatListRequestSuccess (response) {
     chatList.innerHTML  = ''
 
     response.data.map(item => {
-        let chat = item.chat.content? item.chat.content : "-"
+        let chat = item.chat.content ?
+            item.chat.content.length>25 ?
+                item.chat.content.substr(0, 25) + "..."
+                : item.chat.content
+            : "-"
         let avatar = helper.DOMAIN+"/uploads/avatar/"+item.image
         chatList.insertAdjacentHTML('beforeend', `
             <li class="chat-list-item p-2 cursor-pointer" id="chat_list_item" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}">
@@ -128,6 +132,8 @@ function handleSendingMessage (message) {
 }
 
 function handleSendMessageRequestSuccess (message) {
+    let messageInput = document.getElementById('message_input')
+    messageInput.value = ''
     appendOutgoingMessage({content:message})
 }
 
@@ -144,7 +150,7 @@ function appendIncomingMessage (message) {
     document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
         <li class="incoming-message-list" id="s${++x}">
             <div class="p-2 incoming-message-content">
-                ${message.content}<span style="font-size: 9px;"> -${message.time}</span>
+                <img src="${user.avatar}" height="25" class="chat-user-name-avatar"> ${message.content}<span style="font-size: 9px;"> -${message.time}</span>
             </div>
         </li>
     `)
@@ -159,5 +165,5 @@ function appendOutgoingMessage (message) {
             </div class="p-2" >
         </li>
     `)
-    document.querySelector('#chat_details').querySelector("#s"+x).scrollIntoView()
+    document.querySelector('#chat_details').querySelector("#s"+x).scrollIntoView({ behavior: 'smooth'})
 }
