@@ -8,6 +8,7 @@
     <link rel="icon" href ="../../public/assets/images/icons/messenger.png" type = "image/x-icon">
 
     <!-- styles -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../../public/assets/css/master.css">
 
@@ -50,8 +51,21 @@
                     No Chat Available
                 </ul>
             </div>
-            <div class="col-sm-12 col-md-7 col-lg-9 chat-details" id="chat_details">
-
+            <div class="p-0 col-sm-12 col-md-7 col-lg-9">
+                <div class="card chat-details">
+                    <div class="card-header" id="chat_user_name"></div>
+                    <div class="card-body" style="height: 70vh">
+                        <ul class="m-0 p-0" id="chat_details">
+                            <h1 class="text-center">Messenger</h1>
+                        </ul>
+                    </div>
+                    <div class="card-footer" id="send_message_form">
+                        <div class="row ml-0 mr-0 mt-2">
+                            <input type="text" id="message_input" class="form-control col-md-11 col-sm-10 col-lg-10 col-xs-8" placeholder="Aa.." autocomplete="off">
+                            <button type="submit" id="send_message_btn" class="btn btn-primary p-0 col-md-1 sol-sm-2 col-lg-2 col-xs-4"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

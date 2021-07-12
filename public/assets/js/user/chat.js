@@ -1,3 +1,5 @@
+let x=1;
+let user = {}
 document.addEventListener("DOMContentLoaded", () => {
     helper.checkAlert()
     helper.updateAvatar()
@@ -26,10 +28,11 @@ function handleChatListRequestSuccess (response) {
 
     response.data.map(item => {
         let chat = item.chat.content? item.chat.content : "-"
+        let avatar = helper.DOMAIN+"/uploads/avatar/"+item.image
         chatList.insertAdjacentHTML('beforeend', `
-            <li class="chat-list-item p-2" id="chat_list_item" data-id="${item.userId}">
-                <div class="user-name" id="user_name" data-id="${item.userId}">${item.firstName} ${item.lastName}</div>
-                <div class="last-message" id="last_message" data-id="${item.userId}">${chat}</div>
+            <li class="chat-list-item p-2 cursor-pointer" id="chat_list_item" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}">
+                <div class="user-name" id="user_name" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}"><img src="${avatar}" height="25" class="chat-user-name-avatar"> ${item.firstName} ${item.lastName}</div>
+                <div class="last-message" id="last_message" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}">${chat}</div>
             </li>    
         `)
     })
@@ -40,14 +43,8 @@ function handleChatListRequestError(response) {
     if (response.message === "Unauthenticated") {
         window.location.replace('../authentication/login.html')
     }
-    else if (typeof response.message === "string") {
-        helper.alertMessage(response.message, "error")
-    }
     else {
-        Object.keys(response.message).map(key => {
-            if (key === "email") document.getElementById('email_error_message').innerHTML = response.message[key].msg
-            else if (key === "password") document.getElementById('password_error_message').innerHTML = response.message[key].msg
-        })
+        helper.alertMessage(response.message, "error")
     }
 }
 
@@ -56,13 +53,111 @@ function handleChatDetails() {
     let chatListItems = document.getElementById('chat_list').querySelectorAll('.chat-list-item')
     for (let item of chatListItems) {
         item.addEventListener('click', event => {
-            let userId = event.target.getAttribute('data-id')
-            updateChatDetails(userId)
+            user = {
+                id: event.target.getAttribute('data-id'),
+                name: event.target.getAttribute('data-name'),
+                avatar: event.target.getAttribute('data-avatar')
+            }
+            updateChatDetails()
         })
+    }
+    handleSendMessageButton()
+}
+
+function updateChatDetails () {
+    $.ajax({
+        url: helper.DOMAIN+"/api/user/chat/details",
+        method: "GET",
+        headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
+        data: {userId: user.id}
+    }).done(response => {
+        response.success ?
+            handleChatDetailsRequestSuccess(response)
+            : handleChatDetailsRequestError(response)
+    }).fail(err => {
+        console.log(err)
+    })
+}
+
+function handleChatDetailsRequestSuccess (response) {
+    let chatUserName = document.getElementById('chat_user_name')
+    let chatDetails = document.getElementById('chat_details')
+    chatUserName.style.borderBottom = "#333 2px solid"
+    chatUserName.innerHTML = `<img src="${user.avatar}" height="25" class="chat-user-name-avatar"> ${user.name}`
+    chatDetails.innerHTML = ''
+    if (response.data.length===0) chatDetails.innerHTML = 'No message yet'
+
+    // response.data.reverse()
+    response.data.map(message => {
+        if (message.senderId===user.id) appendIncomingMessage(message)
+        else appendOutgoingMessage(message)
+    })
+}
+
+function handleChatDetailsRequestError(response) {
+    if (response.message === "Unauthenticated") {
+        window.location.replace('../authentication/login.html')
+    }
+    else {
+        helper.alertMessage(response.message, "error")
     }
 }
 
-function updateChatDetails (userId) {
-    let chatDetails = document.getElementById('chat_details')
-    chatDetails.innerHTML = userId
+//Sending Message
+function handleSendMessageButton () {
+    let sendMessageButton = document.getElementById('send_message_btn')
+    sendMessageButton.addEventListener("click", () => {
+        let message = document.getElementById('message_input').value
+        if (message) handleSendingMessage(message)
+    })
+}
+
+function handleSendingMessage (message) {
+    $.ajax({
+        url: helper.DOMAIN+"/api/user/chat/send-message",
+        method: "POST",
+        headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
+        data: {userId:user.id, message}
+    }).done(response => {
+        response.success ?
+            handleSendMessageRequestSuccess(message)
+            : handleSendMessageRequestError(response)
+    }).fail(err => {
+        console.log(err)
+    })
+}
+
+function handleSendMessageRequestSuccess (message) {
+    appendOutgoingMessage({content:message})
+}
+
+function handleSendMessageRequestError(response) {
+    if (response.message === "Unauthenticated") {
+        window.location.replace('../authentication/login.html')
+    }
+    else {
+        helper.alertMessage(response.message, "error")
+    }
+}
+
+function appendIncomingMessage (message) {
+    document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
+        <li class="incoming-message-list" id="s${++x}">
+            <div class="p-2 incoming-message-content">
+                ${message.content}<span style="font-size: 9px;"> -${message.time}</span>
+            </div>
+        </li>
+    `)
+    document.querySelector('#chat_details').querySelector("#s"+x).scrollIntoView()
+}
+
+function appendOutgoingMessage (message) {
+    document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
+        <li class="outgoing-message-list" id="s${++x}">
+            <div class="p-2 ml-auto outgoing-message-content">
+                <span style="font-size: 9px;">${message.time} -</span> ${message.content}
+            </div class="p-2" >
+        </li>
+    `)
+    document.querySelector('#chat_details').querySelector("#s"+x).scrollIntoView()
 }

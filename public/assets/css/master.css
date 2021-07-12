@@ -88,13 +88,46 @@ body {
     /*border: var(--secondary) 1px solid;*/
 }
 .chat-list {
-    border: var(--secondary) 1px solid;
+    border-top: var(--secondary) 1px solid;
+    border-right: var(--secondary) 10px solid;
 }
 .chat-details {
-    height: 70vh;
+    height: 75vh;
     border: var(--secondary) 1px solid;
+}
+.card-header,
+.card-footer{
+    background-color: transparent;
 }
 .chat-list-item {
     list-style-type: none;
+    border-left: var(--secondary) 1px solid;
     border-bottom: var(--secondary) 1px solid;
+}
+.chat-user-name-avatar {
+    border-radius: 50%;
+    border: var(--secondary) 2px solid;
+}
+
+.incoming-message-list,
+.outgoing-message-list {
+    margin-top:5px;
+    list-style-type: none;
+}
+.incoming-message-list {
+    margin-right: 30%;
+}
+.outgoing-message-list {
+    margin-left: 30%;
+}
+.incoming-message-content {
+    border-radius: 5px;
+    background-color: #ddd;
+    width: fit-content;
+}
+.outgoing-message-content {
+    border-radius: 5px;
+    background-color: #278;
+    color: #fff;
+    width: fit-content;
 }
