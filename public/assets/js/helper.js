@@ -1,6 +1,21 @@
 let helper = {
     DOMAIN: "http://127.0.0.1:8000",
 
+    getTime: dateTime => {
+        return (dateTime.getHours()<10 ? "0"+dateTime.getHours():dateTime.getHours())
+        +":"+(dateTime.getMinutes()<10 ? "0"+dateTime.getMinutes():dateTime.getMinutes())
+    },
+
+    toAmPm: time =>{
+        let hour = Number(time.substr(0,2))
+        let minute = time.substr(3,2)
+        if (hour===0) time = "12:"+minute+"AM"
+        else if (hour<12) time = time+"AM"
+        else if (hour===12) time = "12:"+minute+"PM"
+        else time = (hour-12)+":"+minute+"PM"
+        return time
+    },
+
     alertMessage : (message, type="success") => {
         let content = `<div style="position: fixed; left: 0; top: 0; width: 100%; z-index: 100">`
         if(type==="success") {

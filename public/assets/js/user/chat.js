@@ -136,7 +136,8 @@ function handleSendingMessage (message) {
 function handleSendMessageRequestSuccess (message) {
     let messageInput = document.getElementById('message_input')
     messageInput.value = ''
-    appendOutgoingMessage({content:message})
+    let time = helper.getTime(new Date())
+    appendOutgoingMessage({content:message, time})
 }
 
 function handleSendMessageRequestError(response) {
@@ -149,10 +150,11 @@ function handleSendMessageRequestError(response) {
 }
 
 function appendIncomingMessage (message) {
+    let time = message.time.length<=5 ? helper.toAmPm(message.time) : message.time
     document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
         <li class="incoming-message-list" id="s${++x}">
             <div class="p-2 incoming-message-content">
-                <img src="${user.avatar}" height="25" class="chat-user-name-avatar"> ${message.content}<span style="font-size: 9px;"> -${message.time}</span>
+                <img src="${user.avatar}" height="25" class="chat-user-name-avatar"> ${message.content}<span style="font-size: 9px;"> -${time}</span>
             </div>
         </li>
     `)
@@ -160,10 +162,11 @@ function appendIncomingMessage (message) {
 }
 
 function appendOutgoingMessage (message) {
+    let time = message.time.length===5 ? helper.toAmPm(message.time) : message.time
     document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
         <li class="outgoing-message-list" id="s${++x}">
             <div class="p-2 ml-auto outgoing-message-content">
-                <span style="font-size: 9px;">${message.time} -</span> ${message.content}
+                <span style="font-size: 9px;">${time} -</span> ${message.content}
             </div class="p-2" >
         </li>
     `)
