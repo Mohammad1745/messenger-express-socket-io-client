@@ -150,7 +150,7 @@ function handleSendMessageRequestError(response) {
 }
 
 function appendIncomingMessage (message) {
-    let time = message.time.length<=5 ? helper.toAmPm(message.time) : message.time
+    let time = message.time.length===5 ? helper.toAmPm(message.time) : message.time
     document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
         <li class="incoming-message-list" id="s${++x}">
             <div class="p-2 incoming-message-content">
