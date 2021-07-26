@@ -1,12 +1,35 @@
 let x=1;
 let user = {}
+let recipient = {}
+let socket
 document.addEventListener("DOMContentLoaded", () => {
+    helper.userInfo(user)
+
     helper.checkAlert()
     helper.updateAvatar()
     helper.handleLogoutButton()
 
+    handleSocketConnection()
     updateChatList()
 })
+
+function handleSocketConnection () {
+    socket = io("http://127.0.0.1:8000")
+    socket.on('connect', () => {
+        console.log('connected')
+    })
+    socket.on('message' , message => {
+        console.log(user, 'user')
+        console.log(recipient, 'user')
+        console.log(message, 'message')
+        // if (message.sender===user.id && message.receiver===recipient.id)
+        if (message.receiver===recipient.id)
+            appendOutgoingMessage(message)
+        // else if (message.receiver===user.id && message.sender===recipient.id)
+        else
+            appendIncomingMessage(message)
+    })
+}
 
 function updateChatList() {
     $.ajax({
@@ -57,7 +80,7 @@ function handleChatDetails() {
     let chatListItems = document.getElementById('chat_list').querySelectorAll('.chat-list-item')
     for (let item of chatListItems) {
         item.addEventListener('click', () => {
-            user = {
+            recipient = {
                 id: item.getAttribute('data-id'),
                 name: item.getAttribute('data-name'),
                 avatar: item.getAttribute('data-avatar')
@@ -73,7 +96,7 @@ function updateChatDetails () {
         url: helper.DOMAIN+"/api/user/chat/details",
         method: "GET",
         headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
-        data: {userId: user.id}
+        data: {userId: recipient.id}
     }).done(response => {
         response.success ?
             handleChatDetailsRequestSuccess(response)
@@ -89,13 +112,13 @@ function handleChatDetailsRequestSuccess (response) {
     let sendMessageForm = document.getElementById('send_message_form')
     sendMessageForm.style.display = "block"
     chatUserName.style.borderBottom = "#333 2px solid"
-    chatUserName.innerHTML = `<img src="${user.avatar}" height="35" class="chat-user-name-avatar"> ${user.name}`
+    chatUserName.innerHTML = `<img src="${recipient.avatar}" height="35" class="chat-user-name-avatar"> ${recipient.name}`
     chatDetails.innerHTML = ''
     if (response.data.length===0) chatDetails.innerHTML = 'No message yet'
 
     // response.data.reverse()
     response.data.map(message => {
-        if (message.senderId===user.id) appendIncomingMessage(message)
+        if (message.senderId===recipient.id) appendIncomingMessage(message)
         else appendOutgoingMessage(message)
     })
 }
@@ -123,7 +146,7 @@ function handleSendingMessage (message) {
         url: helper.DOMAIN+"/api/user/chat/send-message",
         method: "POST",
         headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
-        data: {userId:user.id, message}
+        data: {userId:recipient.id, message}
     }).done(response => {
         response.success ?
             handleSendMessageRequestSuccess(message)
@@ -137,7 +160,8 @@ function handleSendMessageRequestSuccess (message) {
     let messageInput = document.getElementById('message_input')
     messageInput.value = ''
     let time = helper.getTime(new Date())
-    appendOutgoingMessage({content:message, time})
+    // appendOutgoingMessage({content:message, time})
+    socket.emit("message", {sender:user.id, receiver: recipient.id, content:message, time})
 }
 
 function handleSendMessageRequestError(response) {
@@ -154,7 +178,7 @@ function appendIncomingMessage (message) {
     document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
         <li class="incoming-message-list" id="s${++x}">
             <div class="p-2 incoming-message-content">
-                <img src="${user.avatar}" height="25" class="chat-user-name-avatar"> ${message.content}<span style="font-size: 9px;"> -${time}</span>
+                <img src="${recipient.avatar}" height="25" class="chat-user-name-avatar"> ${message.content}<span style="font-size: 9px;"> -${time}</span>
             </div>
         </li>
     `)
