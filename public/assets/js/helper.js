@@ -79,19 +79,17 @@ let helper = {
         })
     },
 
-    userInfo: (user) => {
+    updateUserInfo: (user) => {
         $.ajax({
             url: "http://127.0.0.1:8000/api/user/profile",
             method: "GET",
             headers: { authorization: localStorage.getItem("tokenType") + " " + localStorage.getItem("token")},
         }).done(response => {
             if (response.success) {
-                user = {
-                    id: response.data.id,
-                    firstName: response.data.firstName,
-                    lastName: response.data.lastName,
-                    email: response.data.email
-                }
+                localStorage.setItem('id', response.data.id )
+                localStorage.setItem('firstName', response.data.firstName )
+                localStorage.setItem('lastName', response.data.lastName )
+                localStorage.setItem('email', response.data.email )
             } else {
                 window.location.replace("../authentication/login.html")
             }

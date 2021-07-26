@@ -3,33 +3,15 @@ let user = {}
 let recipient = {}
 let socket
 document.addEventListener("DOMContentLoaded", () => {
-    helper.userInfo(user)
 
     helper.checkAlert()
     helper.updateAvatar()
+    helper.updateUserInfo()
     helper.handleLogoutButton()
 
-    handleSocketConnection()
     updateChatList()
+    handleSocketConnection()
 })
-
-function handleSocketConnection () {
-    socket = io("http://127.0.0.1:8000")
-    socket.on('connect', () => {
-        console.log('connected')
-    })
-    socket.on('message' , message => {
-        console.log(user, 'user')
-        console.log(recipient, 'user')
-        console.log(message, 'message')
-        // if (message.sender===user.id && message.receiver===recipient.id)
-        if (message.receiver===recipient.id)
-            appendOutgoingMessage(message)
-        // else if (message.receiver===user.id && message.sender===recipient.id)
-        else
-            appendIncomingMessage(message)
-    })
-}
 
 function updateChatList() {
     $.ajax({
@@ -80,6 +62,11 @@ function handleChatDetails() {
     let chatListItems = document.getElementById('chat_list').querySelectorAll('.chat-list-item')
     for (let item of chatListItems) {
         item.addEventListener('click', () => {
+            user = {
+                id: localStorage.getItem('id'),
+                name: localStorage.getItem('firstName') + localStorage.getItem('lastName'),
+                email: localStorage.getItem('id')
+            }
             recipient = {
                 id: item.getAttribute('data-id'),
                 name: item.getAttribute('data-name'),
@@ -171,6 +158,19 @@ function handleSendMessageRequestError(response) {
     else {
         helper.alertMessage(response.message, "error")
     }
+}
+
+function handleSocketConnection () {
+    socket = io("http://127.0.0.1:8000")
+    socket.on('connect', () => {
+        console.log('connected')
+    })
+    socket.on('message' , message => {
+        if (message.sender===user.id && message.receiver===recipient.id)
+            appendOutgoingMessage(message)
+        else if (message.receiver===user.id && message.sender===recipient.id)
+            appendIncomingMessage(message)
+    })
 }
 
 function appendIncomingMessage (message) {
