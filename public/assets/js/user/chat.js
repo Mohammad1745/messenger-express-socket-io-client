@@ -3,7 +3,6 @@ let user = {}
 let recipient = {}
 let socket
 document.addEventListener("DOMContentLoaded", () => {
-
     helper.checkAlert()
     helper.updateAvatar()
     helper.updateUserInfo()
@@ -30,6 +29,11 @@ function updateChatList() {
 function handleChatListRequestSuccess (response) {
     let chatList = document.getElementById('chat_list')
     chatList.innerHTML  = ''
+    user = {
+        id: localStorage.getItem('id'),
+        name: localStorage.getItem('firstName') + localStorage.getItem('lastName'),
+        email: localStorage.getItem('id')
+    }
 
     response.data.map(item => {
         let chat = item.chat.content ?
@@ -39,9 +43,9 @@ function handleChatListRequestSuccess (response) {
             : "-"
         let avatar = helper.DOMAIN+"/uploads/avatar/"+item.image
         chatList.insertAdjacentHTML('beforeend', `
-            <li class="chat-list-item p-2 cursor-pointer" id="chat_list_item" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}">
-                <div class="user-name" id="user_name" data-id="${item.userId}"><img src="${avatar}" height="25" class="chat-user-name-avatar"> ${item.firstName} ${item.lastName}</div>
-                <div class="last-message" id="last_message" data-id="${item.userId}">${chat}</div>
+            <li class="chat-list-item p-2 cursor-pointer" id="chat_list_item_${item.userId}" data-id="${item.userId}" data-name="${item.firstName} ${item.lastName}" data-avatar="${avatar}">
+                <div class="user-name" id="user_name_${item.userId}" data-id="${item.userId}"><img src="${avatar}" height="25" class="chat-user-name-avatar"> ${item.firstName} ${item.lastName}</div>
+                <div class="last-message" id="last_message_${item.userId}" data-id="${item.userId}">${chat}</div>
             </li>    
         `)
     })
@@ -57,16 +61,42 @@ function handleChatListRequestError(response) {
     }
 }
 
+function handleSocketConnection () {
+    socket = io("http://127.0.0.1:8000")
+    socket.on('connect', () => {
+        console.log('connected')
+    })
+    socket.on('message' , message => {
+        if (message.sender===user.id && message.receiver===recipient.id)
+            appendOutgoingMessage(message)
+        else if (message.receiver===user.id && message.sender===recipient.id)
+            appendIncomingMessage(message)
+        updateLastMessage (message)
+    })
+}
+
+function updateLastMessage (message) {
+    let content = message.content ?
+        message.content.length>25 ?
+            message.content.substr(0, 25) + "..."
+            : message.content
+        : "-"
+
+    if (message.sender===user.id) {
+        let lastMessage = document.getElementById(`last_message_${message.receiver}`)
+        lastMessage.innerHTML = content
+    }
+    else if (message.receiver===user.id) {
+        let lastMessage = document.getElementById(`last_message_${message.sender}`)
+        lastMessage.innerHTML = content
+    }
+}
+
 //Chat Details
 function handleChatDetails() {
     let chatListItems = document.getElementById('chat_list').querySelectorAll('.chat-list-item')
     for (let item of chatListItems) {
         item.addEventListener('click', () => {
-            user = {
-                id: localStorage.getItem('id'),
-                name: localStorage.getItem('firstName') + localStorage.getItem('lastName'),
-                email: localStorage.getItem('id')
-            }
             recipient = {
                 id: item.getAttribute('data-id'),
                 name: item.getAttribute('data-name'),
@@ -160,19 +190,6 @@ function handleSendMessageRequestError(response) {
     }
 }
 
-function handleSocketConnection () {
-    socket = io("http://127.0.0.1:8000")
-    socket.on('connect', () => {
-        console.log('connected')
-    })
-    socket.on('message' , message => {
-        if (message.sender===user.id && message.receiver===recipient.id)
-            appendOutgoingMessage(message)
-        else if (message.receiver===user.id && message.sender===recipient.id)
-            appendIncomingMessage(message)
-    })
-}
-
 function appendIncomingMessage (message) {
     let time = message.time.length===5 ? helper.toAmPm(message.time) : message.time
     document.querySelector('#chat_details').insertAdjacentHTML('beforeend', `
@@ -182,7 +199,7 @@ function appendIncomingMessage (message) {
             </div>
         </li>
     `)
-    document.querySelector('#chat_details').querySelector("#s"+x).scrollIntoView()
+    document.querySelector('#chat_details').querySelector("#s"+x).scrollIntoView({ behavior: 'smooth'})
 }
 
 function appendOutgoingMessage (message) {
